@@ -4,8 +4,9 @@
 import os, sys
 import random, json
 
-_internalData = os.path.join(sys.path[0], 'BSG', 'data.json')
-
+this_dir, this_filename = os.path.split(__file__)
+_defaultData = os.path.join(this_dir, "default.json")
+print(_defaultData)
 class bullShit():
     '''An object that can generate random bullShit.
     
@@ -27,7 +28,7 @@ class bullShit():
     def __init__(self, theme, jsonFile = None, 
                  repeatLevel = 2, wordLimit = 1000):
         if jsonFile == None:
-            jsonFile = _internalData
+            jsonFile = _defaultData
         self.data = json.loads(open(jsonFile, 'r', encoding = "utf-8").read())
         self.before = self.data['before']
         self.after = self.data['after']
