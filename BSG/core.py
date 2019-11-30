@@ -6,7 +6,6 @@ import random, json
 
 this_dir, this_filename = os.path.split(__file__)
 _defaultData = os.path.join(this_dir, "default.json")
-print(_defaultData)
 class bullShit():
     '''An object that can generate random bullShit.
     
