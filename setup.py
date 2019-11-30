@@ -9,6 +9,6 @@ setup(
 	entry_points={'console_scripts': ['BSG = BSG.__main__:main']},
     packages = ['BSG'],
 	python_requires = '>=3.4',
-    package_data = {'BSG': ['default.json']}, 
+    package_data = {'BSG': ['default.json', 'NMSL/*']}, 
     include_package_data = True
 )

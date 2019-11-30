@@ -24,11 +24,20 @@ class bullShit():
     -------------
     Try print(bullShit(<theme>) to see what happens.
     '''
-    def __init__(self, theme, jsonFile = None, 
+    def __init__(self, theme, jsonFile = None, BSDB = None, BSDBPath = None, 
                  repeatLevel = 2, wordLimit = 1000):
-        if jsonFile == None:
+        if jsonFile == None and BSDB == None:
             jsonFile = _defaultData
-        self.data = json.loads(open(jsonFile, 'r', encoding = "utf-8").read())
+            self.data = json.loads(open(jsonFile, 'r', encoding = "utf-8").read())
+        elif jsonFile != None and BSDB == None:
+            self.data = json.loads(open(jsonFile, 'r', encoding = "utf-8").read())
+        elif jsonFile == None and BSDB != None:
+            if BSDBPath == None:
+                BSDBPath = ''
+            self.data = bsDatabase(name = BSDB, dbPath = BSDBPath)
+        else:
+            raise ValueError('Only one type of data source is supported for now')
+        
         self.before = self.data['before']
         self.after = self.data['after']
         self.theme = theme
@@ -73,8 +82,8 @@ class bullShit():
 
     def _addFullSentence(self):
         sentence = next(self.famousGen)
-        sentence = sentence.replace('a', random.choice(self.before))
-        sentence = sentence.replace('b', random.choice(self.after))
+        sentence = sentence.replace('a', random.choice(list(self.before)))
+        sentence = sentence.replace('b', random.choice(list(self.after)))
         self.essay += sentence
 
     def _addBosh(self):
@@ -90,12 +99,150 @@ class bullShit():
     def __repr__(self):
         return 'NMSL'
 
+class bsDatabase(object):
+    """Manage the database, by either creating your customized new database, 
+    or modifying already existing database. 
+    PLANNING to place the database like this:
+    <NAMEofDB>
+    |__.BSDBID
+       famous.json
+       before.json
+       after.json
+       bosh.json
+    In .dbID, say some BS. """
+    # Examine existing database first
+    def __init__(self, name = 'BSDB', dbPath = '', overwrite = False):
+        self.famous = set()
+        self.before = set()
+        self.after = set()
+        self.bosh = set()
+        self.overwrite = overwrite
+        self.name = name
+        self.dbPath = dbPath
+        if _dbExists(os.path.join(self.dbPath, name)):
+            if not overwrite:
+                self.readDB(name)
+        self.written = False
+        self.Dict = {'famous': self.famous, 'before': self.before, 
+                         'after': self.after, 'bosh': self.bosh}
+
+    def readDB(self, name, overwrite = False):
+        '''Parse a database folder by giving a name. Absolute or relative path 
+        can be added at the start. 
+        Arguments:
+        -------------
+        name      - str. 
+                    The name of the BS database
+        overwrite - Boolean. Optional, default False.
+                    Whether to overwrite the already existing content inside 
+                    this object. If True, it dose; otherwise, it makes the 
+                    union.
+        Returns:
+        -----------
+        Update the bsDatabase object content.
+        '''
+        famousPath = os.path.join(self.dbPath, name, 'famous.json')
+        beforePath = os.path.join(self.dbPath, name, 'before.json')
+        afterPath = os.path.join(self.dbPath, name, 'after.json')
+        boshPath = os.path.join(self.dbPath, name, 'bosh.json')
+
+        famous = json.loads(open(famousPath, 'r', encoding = "utf-8").read())
+        before = json.loads(open(beforePath, 'r', encoding = "utf-8").read())
+        after = json.loads(open(afterPath, 'r', encoding = "utf-8").read())
+        bosh = json.loads(open(boshPath, 'r', encoding = "utf-8").read())
+
+        if overwrite:
+            self.famous = set(famous['famous'])
+            self.before = set(before['before'])
+            self.after = set(after['after'])
+            self.bosh = set(bosh['bosh'])
+        else:
+            self.famous = self.famous.union(set(famous['famous']))
+            self.before = self.before.union(set(before['before']))
+            self.after = self.after.union(set(after['after']))
+            self.bosh = self.bosh.union(set(bosh['bosh']))
+
+    def changePath(self, newPath, newName = None):
+        self.dbPath = newPath
+        if newName != None:
+            self.name = newName
+
+    def addBS(self, data, bsType):
+        '''Add new BS words to the database, with bsType in {'famous', 
+        'before', 'after', 'bosh'} specified.'''
+        if type(data) == str:
+            data = [data]
+        elif type(data) == list:
+            pass
+        else:
+            raise TypeError('Only accept a single sentence or a list of \
+                             sentences.')
+        if bsType == 'famous':
+            data = set([s+'b' for s in data])
+        else:
+            data = set(data)
+        self.Dict[bsType] = self.Dict[bsType].union(data)
+
+    def save(self, name = None, path = None, comment = ''):
+        '''save the database. You still got a chance to rename the object, or 
+        change the place to save it. '''
+        if path == None:
+            path = self.dbPath
+        else:
+            self.dbPath = path
+        if name == None:
+            name = self.name
+        else:
+            self.name = name
+
+        path = os.path.join(path, name)
+        self.written = True
+        if not os.path.exists(path):
+
+            os.makedirs(path)
+        
+        for t, data in self.Dict.items():
+            filePath = os.path.join(path, t+'.json')
+            with open(filePath, 'w', encoding = "utf-8") as outFile:
+                json.dump({t: list(data)}, outFile, sort_keys = True, indent = 2)
+            outFile.close()
+        bsdbid = open(os.path.join(path, '.BSDBID'), 'w', encoding = "utf-8")
+        bsdbid.write(comment)
+        bsdbid.close()
+            
+
+    def nContents(self):
+        '''Returns the total number of sentences included in the database'''
+        return len(self.famous) + len(self.before) + len(self.after) \
+               + len(self.bosh)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        if self.written:
+            w = 'Written'
+        else:
+            w = 'Untouched yet'
+
+        info = '<bsDatabase at %s, with %d contents inside. %s>' % \
+               (os.path.join(self.dbPath, self.name), self.nContents(), w)
+        return info
+    def __getitem__(self, key):
+        return self.Dict[key]
+
+def _dbExists(name):
+    return os.path.isdir(name) and \
+           os.path.exists(os.path.join(name, '.BSDBID'))
+
+
 if __name__ == '__main__':
-    import sys
-    theme = sys.argv[1]
-    if len(sys.argv) > 2:
-        wordLimit = int(sys.argv[2])
-    else:
-        wordLimit = 1000
-    bs = bullShit("data.json", theme, wordLimit = wordLimit)
+    '''Still debugging!!!'''
+    #db = bsDatabase(name = 'NMSL', dbPath = 'D:\\tools\\TTRRYY')
+    #print(db)
+    #print(db['bosh'])
+    #db.addBS('我对这个说法抱有疑问。', 'bosh')
+    #print(db['bosh'])
+    #db.save(name = 'NMSL', path = 'D:\\tools\\TTRRYY', comment = 'NNNNNNN\nMMMMMM\nSSSSSS\nLLLLLLL\n')
+    bs = bullShit('sxc', BSDB = 'NMSL', BSDBPath = 'D:\\tools\\TTRRYY')
     print(bs)
