@@ -3,6 +3,7 @@
 
 import os, sys
 import random, json
+import inspect
 
 this_dir, this_filename = os.path.split(__file__)
 _defaultData = os.path.join(this_dir, "default.json")
@@ -24,20 +25,20 @@ class bullShit():
     -------------
     Try print(bullShit(<theme>) to see what happens.
     '''
-    def __init__(self, theme, jsonFile = None, BSDB = None, BSDBPath = None, 
+    def __init__(self, theme, JSON = None, BSDB = None, BSDBPath = None, 
                  repeatLevel = 2, wordLimit = 1000):
-        if jsonFile == None and BSDB == None:
-            jsonFile = _defaultData
-            self.data = json.loads(open(jsonFile, 'r', encoding = "utf-8").read())
-        elif jsonFile != None and BSDB == None:
-            self.data = json.loads(open(jsonFile, 'r', encoding = "utf-8").read())
-        elif jsonFile == None and BSDB != None:
+        if JSON == None and BSDB == None:
+            JSON = _defaultData
+            self.data = json.loads(open(JSON, 'r', encoding = "utf-8").read())
+        elif JSON != None and BSDB == None:
+            self.data = json.loads(open(JSON, 'r', encoding = "utf-8").read())
+        elif JSON == None and BSDB != None:
             if BSDBPath == None:
                 BSDBPath = ''
             self.data = bsDatabase(name = BSDB, dbPath = BSDBPath)
         else:
             raise ValueError('Only one type of data source is supported for now')
-        
+        self.dbType, self.dbName = _getNotNone(JSON, BSDB)
         self.before = self.data['before']
         self.after = self.data['after']
         self.theme = theme
@@ -235,14 +236,25 @@ def _dbExists(name):
     return os.path.isdir(name) and \
            os.path.exists(os.path.join(name, '.BSDBID'))
 
+def _getNotNone(*args):
+    '''Take multiple variables and return the first one that is not NoneType 
+    with both its variable name while inputing and the value.
+    Method referencing: https://stackoverflow.com/a/18425523
+    Example:
+    -----------
+    >>> a = None
+    >>> b = 2
+    >>> c = 'NMSL'
+    >>> _getNotNone(c, a, b)
+    ('c', 'NMSL')
+    '''
+    callers_local_vars = inspect.currentframe().f_back.f_locals.items()
+    for var in args:
+        if var != None:
+            #print(callers_local_vars)
+            names = [var_name for var_name, var_val in callers_local_vars if var_val is var]
+            return names[0], var
 
 if __name__ == '__main__':
-    '''Still debugging!!!'''
-    #db = bsDatabase(name = 'NMSL', dbPath = 'D:\\tools\\TTRRYY')
-    #print(db)
-    #print(db['bosh'])
-    #db.addBS('我对这个说法抱有疑问。', 'bosh')
-    #print(db['bosh'])
-    #db.save(name = 'NMSL', path = 'D:\\tools\\TTRRYY', comment = 'NNNNNNN\nMMMMMM\nSSSSSS\nLLLLLLL\n')
-    bs = bullShit('sxc', BSDB = 'NMSL', BSDBPath = 'D:\\tools\\TTRRYY')
-    print(bs)
+    '''DEBUG region'''
+    pass

@@ -33,20 +33,20 @@ https://suulnnka.github.io/BullshitGenerator/index.html
 
 ## mvfki Version Update
 
-**1.** Though it is 草 to use Chinese variables but it really sucks :D
-**2.** Modulized as a standard Python module/package. This is just a practice of writing a module/package. Please **DO NOT** use this tool in any formal scenario. 
-**3.** Installation:
+**1.** Though it is 草 to use Chinese variables but it really sucks :D  
+**2.** Modulized as a standard Python module/package. This is just a practice of writing a module/package. Please **DO NOT** use this tool in any formal scenario.  
+**3.** Installation:  
 ```{bash}
 git clone https://github.com/mvfki/BullshitGenerator.git
 cd BullshitGenerator
 python setup.py install
 ```
 **4.** You got two approach to use it.  
-As a console command line tool:  
+- As a console command line tool:  
 ```
 BSG --help
 ```
-As a Python importable module:  
+- As a Python importable module:  
 ```
 $ python
 >>> import BSG

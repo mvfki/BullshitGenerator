@@ -1,6 +1,7 @@
 import argparse
-import sys
+import sys, os
 from .core import *
+from .core import _getNotNone, _getNotNone
 
 def main():
     parser = argparse.ArgumentParser()
@@ -11,7 +12,7 @@ def main():
                         help = 'Optional. By default we load the original data.')
     parser.add_argument('-d', '--bsDataBase', metavar = 'NAME', type = str, 
                         help = 'The name of an existing BSDB. Optional, By default we load the original data')
-    parser.add_argument('-p', '--bsDataBasePath', metavar = 'PATH', type = str, 
+    parser.add_argument('-p', '--bsDataBasePath', metavar = 'PATH', type = str, default = '', 
                         help = 'The path of the existing BSDB, can be included into NAME.')
     parser.add_argument('-w', '--wordLimit', metavar = 'INT', type = int, 
                         default = 1000, 
@@ -19,11 +20,12 @@ def main():
     parser.add_argument('-r', '--repeatLevel', metavar = 'INT', type = int, 
                         default = 2)
     args = parser.parse_args()
-    bs = bullShit(args.theme, jsonFile = args.jsonDataBase, BSDB = args.bsDataBase, 
+    bs = bullShit(args.theme, JSON = args.jsonDataBase, BSDB = args.bsDataBase, 
                   BSDBPath = args.bsDataBasePath, wordLimit = args.wordLimit, 
                   repeatLevel = args.repeatLevel)
     sys.stderr.write('## THEME: %s\n' % args.theme)
     sys.stderr.write('## WORD #: %d\n' % args.wordLimit)
+    sys.stderr.write('## USING %s: %s\n' % (bs.dbType, bs.dbName))
     sys.stderr.write('#### START ####\n')
     sys.stdout.write(str(bs))
     sys.stderr.write('\n#### END ####\n')
