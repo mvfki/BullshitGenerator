@@ -195,13 +195,10 @@ class bsDatabase(object):
             name = self.name
         else:
             self.name = name
-
         path = os.path.join(path, name)
         self.written = True
         if not os.path.exists(path):
-
             os.makedirs(path)
-        
         for t, data in self.Dict.items():
             filePath = os.path.join(path, t+'.json')
             with open(filePath, 'w', encoding = "utf-8") as outFile:
@@ -225,10 +222,10 @@ class bsDatabase(object):
             w = 'Written'
         else:
             w = 'Untouched yet'
-
         info = '<bsDatabase at %s, with %d contents inside. %s>' % \
                (os.path.join(self.dbPath, self.name), self.nContents(), w)
         return info
+        
     def __getitem__(self, key):
         return self.Dict[key]
 

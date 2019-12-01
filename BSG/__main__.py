@@ -1,7 +1,9 @@
 import argparse
 import sys, os
+import logging
 from .core import *
-from .core import _getNotNone, _getNotNone
+from .core import _getNotNone
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -23,12 +25,13 @@ def main():
     bs = bullShit(args.theme, JSON = args.jsonDataBase, BSDB = args.bsDataBase, 
                   BSDBPath = args.bsDataBasePath, wordLimit = args.wordLimit, 
                   repeatLevel = args.repeatLevel)
-    sys.stderr.write('## THEME: %s\n' % args.theme)
-    sys.stderr.write('## WORD #: %d\n' % args.wordLimit)
-    sys.stderr.write('## USING %s: %s\n' % (bs.dbType, bs.dbName))
-    sys.stderr.write('#### START ####\n')
-    sys.stdout.write(str(bs))
-    sys.stderr.write('\n#### END ####\n')
+    logging.basicConfig(level = logging.INFO, format = '%(levelname)s::%(message)s')
+    logging.info('THEME: %s' % args.theme)
+    logging.info('WORD NUMBER: %d' % args.wordLimit)
+    logging.info('USING %s: %s' % (bs.dbType, bs.dbName))
+    logging.info('STARTING')
+    sys.stdout.write(str(bs)+'\n')
+    logging.info('FINISHED')
 
 if __name__ == '__main__':
     main()
