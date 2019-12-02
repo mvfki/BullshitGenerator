@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import os, sys
-import random, json
+import random, json, time
 import inspect
 
 this_dir, this_filename = os.path.split(__file__)
@@ -41,6 +41,7 @@ class bullShit():
         self.dbType, self.dbName = _getNotNone(JSON, BSDB)
         self.before = self.data['before']
         self.after = self.data['after']
+        self.bible = self.data['Bible']
         self.theme = theme
         self._wordLimit = wordLimit
         self.repeatLevel = repeatLevel
@@ -73,6 +74,40 @@ class bullShit():
             else:
                 self._addBosh()
         self.essay = self.essay.replace('x', self.theme)
+
+    def unlimitedPOOPOO(self, intervalTime, interruptPENALTY = 10):
+        '''BE CAREFUL WHEN USING THIS!
+        Press Ctrl + Z to really stop it
+        Arguments:
+        -------------
+        intervalTime - int.
+                       In the unit of second.
+        interruptPENALTY - int.
+                           In the unit of second.'''
+        assert type(intervalTime) == int
+        while True:
+            try:
+                self.essay = '　　'
+                for i in range(3):
+                    self._addFullSentence()
+                self._addBosh()
+                for i in range(2):
+                    self._addFullSentence()
+                self.essay += '\r\n'
+                self.essay = self.essay.replace('x', self.theme)
+                sys.stdout.write(self.essay)
+                time.sleep(intervalTime)
+            except KeyboardInterrupt:
+                self._throwSXC(wait = interruptPENALTY)
+
+    def _throwSXC(self, wait = 10):
+        assert type(wait) == int, "I only want to wait for <int> second(s)"
+        try:
+            dirt = random.choice(self.bible)
+            sys.stdout.write('\n\n　　'+dirt+'\n　　给老子等%d秒\n'%wait)
+            time.sleep(wait)
+        except KeyboardInterrupt:
+            self._throwSXC(wait + 1) 
 
     def _sentence(self, Type):
         pool = list(self.data[Type]) * self.repeatLevel
@@ -225,9 +260,9 @@ class bsDatabase(object):
         info = '<bsDatabase at %s, with %d contents inside. %s>' % \
                (os.path.join(self.dbPath, self.name), self.nContents(), w)
         return info
-        
+
     def __getitem__(self, key):
-        return self.Dict[key]
+        return self.Dict[key]       
 
 def _dbExists(name):
     return os.path.isdir(name) and \

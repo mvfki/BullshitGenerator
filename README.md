@@ -30,6 +30,10 @@ See `help(BSG.bullShit)` for more information.
 - Extend other data files which are like 大草原.
 - Implement subcommand that generates the JSON (or maybe other type of formats) data file, so that user can generate their customized bullShit with their favorite words. 
 
+## New feature
+
+Added `bullShit.unlimitedPOOPOO()` method. **BE CAREFUL** when trying it.
+
 ## Original copy of this README.md
 -----------------------------------------------------------  
 
